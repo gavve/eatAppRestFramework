@@ -1,0 +1,11 @@
+{
+        "user": "jacob",
+        "title": "lunchies",
+        "description": "A very nice dinner with salmon",
+        "numOfPeople": 6,
+        "date_start": "2016-05-18T16:00:00Z",
+        "date_end": "2016-05-18T20:00:00Z",
+        "is_public": true,
+        "location": "nijmegen",
+        "food": []
+    }
