@@ -9,16 +9,16 @@ from django.contrib.auth.decorators import login_required
 from django.test.client import RequestFactory
 
 from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import JSONParser, FileUploadParser, FormParser, MultiPartParser
 from rest_framework import viewsets, permissions, generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.decorators import api_view, renderer_classes, parser_classes
 
 
-from api.serializers import UserSerializer, EventSerializer, SignUpSerializer, EventSerializer, EventCreateSerializer, EventParticipantSerializer
+from api.serializers import *
 from api.models import Event, ParticipantsInEvent, Food
 from customUser.models import MyUser
 
@@ -28,17 +28,70 @@ from oauth2_provider.views.generic import ProtectedResourceView
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 from oauth2_provider.decorators import protected_resource
 
+import StringIO
+
+import base64
+import os
+from django.core.files import File 
+from django.core.files.base import ContentFile
+from PIL import Image
 
 
 class SignUp(generics.CreateAPIView):
 	queryset = MyUser.objects.all()
 	serializer_class = SignUpSerializer
 	permission_classes = (IsAuthenticatedOrCreate,)
+	parser_classes = (MultiPartParser, FormParser)
+
+	def post(self, request, format=None):
+		serializer = SignUpSerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ApiEndpoint(ProtectedResourceView):
-	def get(self, request, *args, **kwargs):
-		return HttpResponse('Hello, OAuth2!')
+class FileUploadView(APIView):
+	parser_classes = (FileUploadParser,)
+
+	def put(self, request, filename, user_pk, format=None):
+		file_obj = request.data['file']
+		#f=open('profilepictures/donalduploaded.jpg')
+		#f.write(file_obj,'wb')
+		#f.close()
+		# Save file (image) to user
+		# image_file = StringIO.StringIO(file_obj.read()) 
+		user = MyUser.objects.get(pk=user_pk)
+		#user.profile_picture.save('profilepictures/'+str(user.pk)+'.jpg', ContentFile(im))
+		from PIL import Image as ImageObj
+		from cStringIO import StringIO
+		from django.core.files.uploadedfile import SimpleUploadedFile
+
+		try:
+			# thumbnail
+			THUMBNAIL_SIZE = (160, 160)  # dimensions
+
+			image = ImageObj.open(file_obj)
+
+			# Convert to RGB if necessary
+			if image.mode not in ('L', 'RGB'): image = image.convert('RGB')
+
+			# create a thumbnail + use antialiasing for a smoother thumbnail
+			#image.thumbnail(THUMBNAIL_SIZE, ImageObj.ANTIALIAS)
+
+			# fetch image into memory
+			temp_handle = StringIO()
+			user.profile_picture.save(temp_handle, 'png')
+			temp_handle.seek(0)
+
+			# save it
+			#file_name, file_ext = os.path.splitext(self.image.name.rpartition('/')[-1])
+			suf = SimpleUploadedFile("file_name" + file_ext, temp_handle.read(), content_type='image/png')
+
+			#self.thumbnail.save(file_name + '.png', suf, save=False)
+		except ImportError:
+			pass
+		return Response(status=204)
 
 
 class UserViewSet(viewsets.ModelViewSet):

@@ -27,9 +27,6 @@ from rest_framework.authtoken import views
 
 from push_notifications.api.rest_framework import GCMDeviceAuthorizedViewSet
 
-#router = DefaultRouter()
-#router.register(r'users', UserViewSet)
-
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
@@ -44,8 +41,9 @@ urlpatterns = [
 	url(r'^events/(?P<pk>[0-9]+)/$', EventDetail.as_view(), name='event-detail'),
 	url(r'^users/$', UserViewSet.as_view({'get': 'list'}), name='myuser-list'),
 	url(r'^users/(?P<pk>[0-9]+)/$', UserDetail.as_view(), name='myuser-detail'),
-	url(r'^api/hello', ApiEndpoint.as_view()),  # and also a resource server!
+	# url(r'^api/hello', ApiEndpoint.as_view()),  # and also a resource server!
 	url(r'^sign_up/$', SignUp.as_view(), name="sign_up"),
+	url(r'^upload/(?P<filename>[^/]+)/(?P<user_pk>[0-9]+)/$', FileUploadView.as_view()), # support for dealing with uploading profile_pictures
 	url(r'^u_pk/(?P<pk>[0-9]+)/$', GetUserByPk.as_view(), name='getuserbypk-detail'),
 	url(r'^u/(?P<email>[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})', GetUserByMail.as_view(), name="getuserbymail-detail"),
 	url(r'^device/gcm/?$', GCMDeviceAuthorizedViewSet.as_view({'post': 'create'}), name='create_apns_device'),
@@ -54,6 +52,5 @@ urlpatterns = [
 
 #urlpatterns += router.urls
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-urlpatterns += format_suffix_patterns(urlpatterns)
 
 """url(r'^find_close_events/(?P<email_of_x>[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})/(?P<current_latitude>-?\d{2,3}.\d{5})/(?P<current_longitiude>-?\d{2,3}.\d{5})/$', v.find_close_events, name='event-list-local'),"""

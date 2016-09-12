@@ -1,0 +1,17 @@
+curl -X POST -S -H "Content-Type: multipart/form-data" \
+  -F "email=aaaabbbaa@aaaaaaaa.se" \
+  -F "first_name=Donald" \
+  -F "password=hejsan" \
+  -F "date_of_birth=1989-01-25" \
+  -F "profile_picture=@/home/jacob/donald.jpg" \
+  http://127.0.0.1:8000/sign_up/
+
+
+curl -H "Content-Type:multipart/form-data" -X POST -d '{"email": "tesaat@testar.se", "date_of_birth": "1990-07-07", "first_name": "Donald", "password": "test", "profile_picture": "@/home/jacob/donald.jpg"}' http://192.168.1.229:8000/sign_up/
+
+
+
+curl -X PUT -S -H "Authorization: Bearer hejsan" \
+-F "file=@/home/jacob/donald.jpg;type=image/jpg" \
+http://192.168.1.172:8000/upload/donald.jpg/2/
+

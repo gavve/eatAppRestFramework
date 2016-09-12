@@ -8,7 +8,7 @@ from django.contrib.auth.models import (
 
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, date_of_birth, first_name, profile_picture, password=None):
+    def create_user(self, email, date_of_birth, first_name, password=None):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -20,7 +20,7 @@ class MyUserManager(BaseUserManager):
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
             first_name=first_name,
-            profile_picture=profile_picture,
+            profile_picture=profile_picture
         )
 
         user.set_password(password)
@@ -32,9 +32,11 @@ class MyUserManager(BaseUserManager):
         Creates and saves a superuser with the given email, date of
         birth and password.
         """
-        user = self.create_user(email,
+        user = self.create_user(email=email,
             password=password,
-            date_of_birth=date_of_birth
+            date_of_birth=date_of_birth,
+            first_name="Admin",
+            profile_picture="profilepictures/default.png"
         )
         user.is_admin = True
         user.save(using=self._db)
