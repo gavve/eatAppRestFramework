@@ -8,7 +8,7 @@ from django.contrib.auth.models import (
 
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, date_of_birth, first_name, password=None):
+    def create_user(self, email, date_of_birth, profile_picture, password=None):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -19,7 +19,6 @@ class MyUserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
-            first_name=first_name,
             profile_picture=profile_picture
         )
 
@@ -32,11 +31,11 @@ class MyUserManager(BaseUserManager):
         Creates and saves a superuser with the given email, date of
         birth and password.
         """
-        user = self.create_user(email=email,
+        user = self.create_user(
+            email=self.normalize_email(email),
             password=password,
             date_of_birth=date_of_birth,
-            first_name="Admin",
-            profile_picture="profilepictures/default.png"
+            profile_picture='profilepictures/default.png'
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -54,7 +53,7 @@ class MyUser(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     first_name = models.CharField(max_length=20)
     surname = models.CharField(max_length=30, null=True)
-    profile_picture = models.ImageField(upload_to="profilepictures/", null=True, default='profilepictures/default.png')
+    profile_picture = models.ImageField(upload_to="profilepictures/", blank=True, null=True, default='profilepictures/default.png')
     
     # Location field
     last_location = models.PointField(max_length=40, null=True)
